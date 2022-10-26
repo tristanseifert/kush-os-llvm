@@ -30,6 +30,7 @@
 #include "ToolChains/Haiku.h"
 #include "ToolChains/Hexagon.h"
 #include "ToolChains/Hurd.h"
+#include "ToolChains/Kush.h"
 #include "ToolChains/Lanai.h"
 #include "ToolChains/Linux.h"
 #include "ToolChains/MSP430.h"
@@ -6005,6 +6006,9 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
       break;
     case llvm::Triple::NaCl:
       TC = std::make_unique<toolchains::NaClToolChain>(*this, Target, Args);
+      break;
+    case llvm::Triple::Kush:
+      TC = std::make_unique<toolchains::Kush>(*this, Target, Args);
       break;
     case llvm::Triple::Fuchsia:
       TC = std::make_unique<toolchains::Fuchsia>(*this, Target, Args);

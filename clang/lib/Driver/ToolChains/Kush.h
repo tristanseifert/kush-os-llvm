@@ -1,0 +1,102 @@
+//===--- Kush.h - Kush ToolChain Implementations ----------*- C++ -*-===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_KUSH_H
+#define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_KUSH_H
+
+#include "Gnu.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Driver/Tool.h"
+#include "clang/Driver/ToolChain.h"
+
+namespace clang {
+namespace driver {
+namespace tools {
+namespace kush {
+/*
+ * Kush should use lld (the llvm linker) if possible.
+ */
+class LLVM_LIBRARY_VISIBILITY Linker : public Tool {
+public:
+  Linker(const ToolChain &TC) : Tool("kush::Linker", "ld.lld", TC) {}
+
+  bool hasIntegratedCPP() const override { return false; }
+  bool isLinkJob() const override { return true; }
+
+  void ConstructJob(Compilation &C, const JobAction &JA,
+                    const InputInfo &Output, const InputInfoList &Inputs,
+                    const llvm::opt::ArgList &TCArgs,
+                    const char *LinkingOutput) const override;
+};
+} // end namespace kush
+} // end namespace tools
+
+namespace toolchains {
+
+class LLVM_LIBRARY_VISIBILITY Kush : public ToolChain {
+public:
+  Kush(const Driver &D, const llvm::Triple &Triple,
+          const llvm::opt::ArgList &Args);
+
+  bool HasNativeLLVMSupport() const override { return true; }
+  bool IsIntegratedAssemblerDefault() const override { return true; }
+  bool IsMathErrnoDefault() const override { return false; }
+  bool useRelaxRelocations() const override { return true; };
+  // use clang native runtime libraries
+  RuntimeLibType GetDefaultRuntimeLibType() const override {
+    return ToolChain::RLT_CompilerRT;
+  }
+  // we only support the llvm libc++
+  CXXStdlibType GetDefaultCXXStdlibType() const override {
+    return ToolChain::CST_Libcxx;
+  }
+  bool IsUnwindTablesDefault(const llvm::opt::ArgList &Args) const override {
+    return true;
+  }
+  bool isPICDefault() const override { return false; }
+  bool isPIEDefault(const llvm::opt::ArgList &Args) const override { return false; }
+  bool isPICDefaultForced() const override { return false; }
+  llvm::DebuggerKind getDefaultDebuggerTuning() const override {
+    return llvm::DebuggerKind::GDB;
+  }
+
+  LangOptions::StackProtectorMode
+  GetDefaultStackProtectorLevel(bool KernelOrKext) const override {
+    return LangOptions::SSPStrong;
+  }
+
+  std::string ComputeEffectiveClangTriple(const llvm::opt::ArgList &Args,
+                                          types::ID InputType) const override;
+
+  RuntimeLibType
+  GetRuntimeLibType(const llvm::opt::ArgList &Args) const override;
+
+  void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
+                             llvm::opt::ArgStringList &CC1Args,
+                             Action::OffloadKind DeviceOffloadKind) const override;
+  void
+  AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,
+                            llvm::opt::ArgStringList &CC1Args) const override;
+  void AddCXXStdlibLibArgs(const llvm::opt::ArgList &Args,
+                           llvm::opt::ArgStringList &CmdArgs) const override;
+  void AddClangCXXStdlibIncludeArgs(const llvm::opt::ArgList &DriverArgs,
+                                    llvm::opt::ArgStringList &CC1Args) const override;
+
+  const char *getDefaultLinker() const override {
+    return "ld.lld";
+  }
+
+protected:
+  Tool *buildLinker() const override;
+};
+
+} // end namespace toolchains
+} // end namespace driver
+} // end namespace clang
+
+#endif // LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_KUSH_H

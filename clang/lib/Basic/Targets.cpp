@@ -159,6 +159,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       default: // Assume MSVC for unknown environments
         return new MicrosoftARM64TargetInfo(Triple, Opts);
       }
+    case llvm::Triple::Kush:
+      return new KushTargetInfo<AArch64leTargetInfo>(Triple, Opts);
     default:
       return new AArch64leTargetInfo(Triple, Opts);
     }
@@ -209,6 +211,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       default: // Assume MSVC for unknown environments
         return new MicrosoftARMleTargetInfo(Triple, Opts);
       }
+    case llvm::Triple::Kush:
+      return new KushTargetInfo<ARMleTargetInfo>(Triple, Opts);
     default:
       return new ARMleTargetInfo(Triple, Opts);
     }
@@ -231,6 +235,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       return new RTEMSTargetInfo<ARMbeTargetInfo>(Triple, Opts);
     case llvm::Triple::NaCl:
       return new NaClTargetInfo<ARMbeTargetInfo>(Triple, Opts);
+    case llvm::Triple::Kush:
+      return new KushTargetInfo<ARMbeTargetInfo>(Triple, Opts);
     default:
       return new ARMbeTargetInfo(Triple, Opts);
     }
@@ -540,6 +546,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       return new MCUX86_32TargetInfo(Triple, Opts);
     case llvm::Triple::Hurd:
       return new HurdTargetInfo<X86_32TargetInfo>(Triple, Opts);
+    case llvm::Triple::Kush:
+      return new KushTargetInfo<X86_32TargetInfo>(Triple, Opts);
     default:
       return new X86_32TargetInfo(Triple, Opts);
     }
@@ -594,6 +602,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       return new PS4OSTargetInfo<X86_64TargetInfo>(Triple, Opts);
     case llvm::Triple::PS5:
       return new PS5OSTargetInfo<X86_64TargetInfo>(Triple, Opts);
+    case llvm::Triple::Kush:
+      return new KushTargetInfo<X86_64TargetInfo>(Triple, Opts);
     default:
       return new X86_64TargetInfo(Triple, Opts);
     }

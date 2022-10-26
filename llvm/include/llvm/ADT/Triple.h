@@ -218,6 +218,7 @@ public:
     Hurd,       // GNU/Hurd
     WASI,       // Experimental WebAssembly OS
     Emscripten,
+    Kush,       // kush-os
     ShaderModel, // DirectX ShaderModel
     LastOSType = ShaderModel
   };
